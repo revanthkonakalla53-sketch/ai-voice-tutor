@@ -1,44 +1,71 @@
-# LinguaAI — AI Voice Language Tutor
+# LanguageAI — AI Voice Language Tutor
 
-> **Project 4 — Intermediate Track**  
-> A learner speaks a sentence in any language; the app transcribes it, checks grammar and word choice with Gemini AI, and speaks back a corrected version.
-
-> **Note:** This project was built with the assistance of an AI coding assistant (Google Antigravity / Gemini).
+Speak a sentence in any language. LanguageAI transcribes your voice in the browser using the Web Speech API, sends the text to Gemini AI for grammar and vocabulary analysis, and reads back a corrected version with the browser's built-in Text-to-Speech engine. Past sessions are saved to `localStorage` so you can track your progress over time.
 
 ---
 
-## 🚀 Live Demo
+## Features
 
-Deploy link here after Vercel deployment.
-
----
-
-## ✨ Features
-
-- 🎙️ **Voice Recording** — In-browser mic recording with real-time waveform visualizer
-- 🌐 **Auto Language Detection** — Supports 13 languages (English, Spanish, French, German, Japanese, Hindi, Portuguese, Italian, Chinese, Korean, Russian, Arabic, and more)
-- 🤖 **Gemini AI Analysis** — Grammar corrections, vocabulary improvements, fluency score (1–10), and friendly explanations
-- 🔊 **Text-to-Speech Playback** — Google Neural2 voices read back the corrected sentence at a natural learning pace
-- 📊 **Detailed Feedback** — Error-by-error breakdown with original/corrected comparison and actionable tips
-- 💡 **Native Speaker Phrasing** — Suggests how a native speaker would naturally say the sentence
-- 📱 **Responsive UI** — Works on desktop and mobile
+- **In-browser voice recording** — Uses the Web Speech API (no server-side STT). Live waveform visualizer and real-time transcript preview while you speak.
+- **13 supported languages** — English, Spanish, French, German, Japanese, Hindi, Portuguese, Italian, Mandarin Chinese, Korean, Russian, Arabic, and Auto-detect mode.
+- **Gemini AI grammar analysis** — Sends the transcript to Gemini AI and gets back a fluency score (1–10), a list of individual errors with explanations, a corrected sentence, and a native-speaker phrasing suggestion.
+- **Browser Text-to-Speech playback** — Reads the corrected sentence aloud using `window.speechSynthesis` at a slower rate (0.85×) for learning. Supports play/pause and re-reading the native phrase.
+- **Session history** — Every completed session is saved to `localStorage`. Tracks average score, best score, a 7-session trend sparkline, most common error type, and total session count.
+- **Progress panel** — Compact stats panel in the header that expands to show the full session log.
+- **Responsive layout** — Works on desktop and mobile. Glassmorphism design with CSS custom properties and smooth animations.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 14 (App Router) |
-| LLM | Google Gemini 1.5 Flash |
-| Speech-to-Text | Google Cloud Speech-to-Text v1 |
-| Text-to-Speech | Google Cloud Text-to-Speech v1 (Neural2 voices) |
-| Styling | Vanilla CSS with glassmorphism + animations |
-| Deployment | Vercel |
+| Framework | Next.js 16 (App Router) |
+| Language | JavaScript (JSX) |
+| LLM | Google Gemini AI via `@google/generative-ai` |
+| Speech-to-Text | Web Speech API (`window.SpeechRecognition`) — browser-native, free |
+| Text-to-Speech | Web Speech Synthesis API (`window.speechSynthesis`) — browser-native, free |
+| Styling | Vanilla CSS with CSS custom properties, glassmorphism, and animations |
+| Session storage | `localStorage` |
+| Deployment | Vercel (recommended) |
+
+> **No Google Cloud account required.** Both STT and TTS run entirely in the browser. The only API key you need is a free Gemini API key.
 
 ---
 
-## ⚙️ Setup (Local)
+## Project Structure
+
+```
+ai-voice-tutor/
+├── app/
+│   ├── layout.js                   # Root layout, metadata, viewport config
+│   ├── page.js                     # Main page — wires all components together
+│   ├── globals.css                 # Full design system (tokens, components, animations)
+│   ├── page.module.css             # Page-level layout styles
+│   └── api/
+│       └── analyze/
+│           └── route.js            # POST /api/analyze — Gemini grammar analysis
+├── components/
+│   ├── VoiceRecorder.jsx           # Mic button, waveform canvas, Web Speech API
+│   ├── FeedbackCard.jsx            # Displays Gemini score, errors, corrections, tip
+│   ├── AudioPlayer.jsx             # Browser TTS playback (corrected + native phrase)
+│   ├── LanguageSelector.jsx        # Language picker dropdown (13 languages)
+│   ├── ProgressPanel.jsx           # Stats header + expandable session history
+│   └── SessionHistory.jsx          # Full session log list
+├── hooks/
+│   └── useSessionHistory.js        # localStorage persistence + derived stats
+├── .env.example                    # Template — copy to .env.local and add your key
+├── .env.local                      # Your API keys (never committed — in .gitignore)
+├── .gitignore
+├── jsconfig.json
+├── next.config.mjs
+├── eslint.config.mjs
+└── package.json
+```
+
+---
+
+## Getting Started
 
 ### 1. Clone the repository
 
@@ -48,155 +75,188 @@ cd ai-voice-tutor
 npm install
 ```
 
-### 2. Get your API keys
+### 2. Get a Gemini API key (free)
 
-#### Gemini API Key (free)
 1. Go to [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
-2. Click **"Create API key"**
+2. Click **Create API key**
 3. Copy the key
 
-#### Google Cloud API Key (for STT + TTS)
-1. Go to [https://console.cloud.google.com/](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Navigate to **APIs & Services -> Library**
-4. Enable **"Cloud Speech-to-Text API"**
-5. Enable **"Cloud Text-to-Speech API"**
-6. Go to **APIs & Services -> Credentials**
-7. Click **"Create Credentials -> API key"**
-8. Copy the key
+No credit card required. The Gemini Flash model used here is on the free tier.
 
-### 3. Configure environment variables
+### 3. Set up environment variables
 
-Create a `.env.local` file in the project root:
+Copy the example file and fill in your key:
+
+```bash
+cp .env.example .env.local
+```
+
+Then open `.env.local` and replace the placeholder:
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-GOOGLE_CLOUD_API_KEY=your_google_cloud_api_key_here
 ```
 
-Never commit `.env.local` to GitHub. It is already in `.gitignore`.
+`.env.local` is already listed in `.gitignore` — it will never be committed.
 
-### 4. Run locally
+### 4. Run the development server
 
 ```bash
 npm run dev
 ```
 
-Open http://localhost:3000 in your browser.
+Open [http://localhost:3000](http://localhost:3000) in **Chrome or Edge**. The Web Speech API requires one of these browsers — Firefox and Safari do not fully support it.
 
 ---
 
-## 🌐 Deployment (Vercel)
+## API Route
 
-### Option A — Vercel CLI
+Only one server-side API route exists in this project. Both STT and TTS run in the browser.
 
-```bash
-npm install -g vercel
-vercel
+### `POST /api/analyze`
+
+Sends the transcribed text to Gemini AI and returns structured feedback.
+
+**Request body:**
+
+```json
+{
+  "transcript": "I has been going to the store yesterday.",
+  "languageCode": "en-US",
+  "languageLabel": "English"
+}
 ```
 
-Follow the prompts. When asked about environment variables, add both keys.
+**Response body:**
 
-### Option B — Vercel Dashboard (recommended)
+```json
+{
+  "score": 5,
+  "isCorrect": false,
+  "correctedSentence": "I went to the store yesterday.",
+  "nativePhrase": "I made a trip to the store yesterday.",
+  "detectedLanguageCode": "en-US",
+  "errors": [
+    {
+      "type": "Grammar",
+      "original": "I has been going",
+      "correction": "I went",
+      "explanation": "Use simple past tense for a completed action in the past."
+    }
+  ],
+  "tip": "Use simple past tense (went, saw, ate) for actions that happened at a specific time in the past."
+}
+```
 
-1. Push your code to GitHub
-2. Go to https://vercel.com/new
-3. Import your GitHub repository
-4. Before deploying, go to **"Environment Variables"** and add:
-   - `GEMINI_API_KEY` = your Gemini key
-   - `GOOGLE_CLOUD_API_KEY` = your Google Cloud key
-5. Click **Deploy**
+The route uses `@google/generative-ai` to call Gemini with a structured prompt that enforces JSON output. It strips markdown code fences from the response before parsing to handle any model formatting inconsistencies.
 
 ---
 
-## 📐 Architecture
+## How It Works (Data Flow)
 
 ```
-User speaks -> Browser MediaRecorder
+User clicks mic
     |
-/api/transcribe -> Google Cloud STT
-    | transcript + language
-/api/analyze -> Gemini 1.5 Flash (structured JSON prompt)
-    | score, errors, corrections, tip
-/api/speak -> Google Cloud TTS (Neural2 voice)
-    | MP3 audio blob
-Browser AudioPlayer -> plays corrected sentence
+VoiceRecorder — Web Speech API starts listening (browser-native, free)
+    |  live transcript shown in real time
+User clicks stop (or 60-second limit reached)
+    |
+page.js — POST /api/analyze  { transcript, languageCode }
+    |
+/api/analyze — Gemini AI returns structured JSON feedback
+    |
+FeedbackCard — renders score, errors, corrected sentence, tip
+    |
+AudioPlayer — window.speechSynthesis reads the corrected sentence aloud
+    |
+useSessionHistory — saves session to localStorage
+    |
+ProgressPanel — updates stats (avg score, best, sparkline, top error type)
 ```
-
-### API Routes
-
-| Route | Method | Description |
-|---|---|---|
-| `/api/transcribe` | POST | Converts audio blob to text via Google STT |
-| `/api/analyze` | POST | Sends transcript to Gemini, returns structured feedback JSON |
-| `/api/speak` | POST | Converts corrected text to MP3 via Google TTS |
 
 ---
 
-## 🎯 Approach and Design Decisions
+## Design Decisions
 
-### Why Gemini 1.5 Flash?
-- Free tier with generous rate limits
-- Fast inference (~1-2s) suitable for interactive use
-- Excellent multilingual grammar understanding
-- Structured JSON output via prompt engineering (no function calling needed)
+### Web Speech API instead of Google Cloud STT
 
-### Why Google Cloud STT?
-- Supports 125+ languages with the `languageCode` parameter
-- `alternativeLanguageCodes` enables auto-detection across multiple languages
-- `latest_long` model gives best accuracy for conversational speech
-- `WEBM_OPUS` encoding works directly with browser MediaRecorder output
+The Web Speech API runs entirely in the browser — no audio is uploaded to any server, there are no usage quotas, and no Google Cloud project or billing setup is needed. The trade-off is browser compatibility: Chrome and Edge support it well; Firefox and Safari do not.
 
-### Why server-side API routes?
-- API keys are never exposed to the browser
-- CORS is handled automatically
-- Audio processing (base64 encoding) happens server-side
+### Browser TTS instead of Google Cloud TTS
 
-### Error Handling
-- STT: Handles no-speech, low-confidence, and API errors gracefully
-- Gemini: JSON parsing fallback with regex extraction if model wraps in markdown
-- TTS: Non-blocking — feedback is still shown even if TTS fails
-- Each step shows user-friendly error messages in the UI
+`window.speechSynthesis` is free, has no API key requirements, and is available in all modern browsers. The quality is lower than Neural2 voices but is sufficient for language learning playback. The `AudioPlayer` component sets `rate` to `0.85` and `pitch` to `1.0` for a natural, learner-friendly pace.
+
+### localStorage for session history
+
+Sessions are stored in `localStorage` under the key `lingua_ai_sessions`. A maximum of 50 sessions is kept (oldest are dropped). This approach requires no database, no auth, and works entirely offline after the initial page load. The `useSessionHistory` hook derives aggregate stats (`avg`, `best`, `recent7`, `topError`) on every render from the raw sessions array.
+
+### Gemini prompt engineering
+
+The `/api/analyze` route sends a detailed system prompt that instructs Gemini to return a strict JSON object. The prompt includes the target language, the transcript, and explicit field definitions with types and constraints. A regex post-processing step strips any markdown code fences the model might add, ensuring reliable JSON parsing.
+
+---
+
+## Browser Requirements
+
+| Browser | Recording | Playback |
+|---|---|---|
+| Chrome 90+ | Full support | Full support |
+| Edge 90+ | Full support | Full support |
+| Firefox | No Web Speech API | Playback works |
+| Safari | Partial (iOS 15+) | Playback works |
 
 ---
 
 ## Known Limitations
 
-1. **60-second recording limit** — Google STT synchronous recognize supports up to 1 minute. For longer recordings, longrunningrecognize would be needed.
-2. **Browser mic support** — Requires a modern browser (Chrome, Firefox, Edge). Safari may have limited WebM support.
-3. **STT accuracy** — Background noise and accents can reduce accuracy. The `useEnhanced: true` model mitigates this.
-4. **Rate limits** — Free tier Gemini API has rate limits. For production use, consider request queuing.
-5. **TTS voice availability** — Not all languages have Neural2 voices. Falls back to standard voices automatically.
+- **60-second recording cap** — The timer stops recording at 60 seconds and submits whatever was transcribed. This is a practical limit of the Web Speech API's continuous mode.
+- **Chrome and Edge only for recording** — Firefox and Safari lack full Web Speech API support. A fallback error message is shown to unsupported browser users.
+- **No backend session storage** — Sessions are stored in the browser only. Clearing browser data or switching devices resets history.
+- **TTS voice quality varies by OS** — The voices available through `speechSynthesis` depend on the operating system. High-quality voices are available on macOS and Windows 11; Android and older Windows versions may sound more robotic.
+- **Gemini free tier rate limits** — The free tier allows 15 RPM and 1,500 requests per day. For production use with many concurrent users, consider a paid plan or request queuing.
 
 ---
 
-## 🏆 Stretch Goal: Session Tracking
+## Deployment
 
-A future enhancement could:
-- Store sessions in localStorage or a database (e.g., Firestore)
-- Show progress over time (score trend chart)
-- Adapt difficulty by tracking common error types per user
+### Vercel (recommended)
+
+1. Push the repository to GitHub
+2. Go to [https://vercel.com/new](https://vercel.com/new) and import the repository
+3. Under **Environment Variables**, add:
+   - `GEMINI_API_KEY` — your Gemini API key
+4. Click **Deploy**
+
+### Other platforms
+
+This is a standard Next.js app and can be deployed anywhere Node.js is supported.
+
+```bash
+npm run build   # Build for production
+npm start       # Serve the production build
+```
 
 ---
 
-## 📁 Project Structure
+## Scripts
 
-```
-ai-voice-tutor/
-├── app/
-│   ├── page.js                  # Main UI page
-│   ├── layout.js                # Root layout + SEO metadata
-│   ├── globals.css              # Design system
-│   └── api/
-│       ├── transcribe/route.js  # Google STT endpoint
-│       ├── analyze/route.js     # Gemini LLM endpoint
-│       └── speak/route.js       # Google TTS endpoint
-├── components/
-│   ├── VoiceRecorder.jsx        # Mic + waveform
-│   ├── FeedbackCard.jsx         # AI feedback display
-│   ├── LanguageSelector.jsx     # Language picker
-│   └── AudioPlayer.jsx          # TTS playback
-├── .env.local                   # API keys (not committed)
-├── .env.example                 # Template
-└── README.md
-```
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server on http://localhost:3000 |
+| `npm run build` | Build production bundle |
+| `npm start` | Serve the production build |
+| `npm run lint` | Run ESLint |
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | Yes | Gemini API key for grammar analysis. Free at [aistudio.google.com](https://aistudio.google.com/app/apikey) |
+
+---
+
+## License
+
+MIT
