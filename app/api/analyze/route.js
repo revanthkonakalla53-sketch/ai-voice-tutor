@@ -41,7 +41,7 @@ export async function POST(request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash-lite' });
 
     // Build a language hint for the prompt
     const langHint = languageLabel && languageLabel !== 'Auto-detect'
