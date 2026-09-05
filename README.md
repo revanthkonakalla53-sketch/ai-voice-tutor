@@ -4,7 +4,7 @@ Speak a sentence in any language. LanguageAI transcribes your voice in the brows
 
 ---
 DEPLOYED LINK :  https://ai-voice-tutor-rho.vercel.app/
-
+progress section is also included,after the feedback scroll up and click on progress button
 ## Features
 
 - **In-browser voice recording** — Uses the Web Speech API (no server-side STT). Live waveform visualizer and real-time transcript preview while you speak.
