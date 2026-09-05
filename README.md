@@ -3,6 +3,7 @@
 Speak a sentence in any language. LanguageAI transcribes your voice in the browser using the Web Speech API, sends the text to Gemini AI for grammar and vocabulary analysis, and reads back a corrected version with the browser's built-in Text-to-Speech engine. Past sessions are saved to `localStorage` so you can track your progress over time.
 
 ---
+DEPLOYED LINK :  https://ai-voice-tutor-rho.vercel.app/
 
 ## Features
 
